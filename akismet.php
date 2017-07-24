@@ -1,17 +1,22 @@
 <?php
 /**
  *	This is plugin for Akismet SPAM filtering using the Akismet PHP5 Class
- *	@authors : vincent3569 {http://www.vincentbourganel.fr/} helped by Hervé Queyranne
- *	@version 1.2.0
+ * @author Vincent Bourganel (vincent3569)
+ * @version 2.0.1
+ * @package plugins
+ * @subpackage spam
  *
  *	based on the initial Akismet plugin for ZenPhoto
- *	@authors : GameDudeX, Thinkdreams, Kieran O'Shea
+ *	authors GameDudeX, Thinkdreams, Kieran O'Shea
  *
  *	based on Akismet PHP5 Class
- *	@author		Alex Potsides (http://www.achingbrain.net)
- *	@version	0.5
+ *	author Alex Potsides (http://www.achingbrain.net)
+ *	version 0.5
  *
- *	@changelog :
+ *	changelog :
+ *	- version 2.0
+ *		- rewrite to use zenphoto plugin architecture
+ *		- needs the ZenPhoto official release 1.4.4 or more
  *	- version 1.2.0
  *		- needs the ZenPhoto official release 1.4.2 or more
  *		- migration on release 0.5 of Akismet PHP5 Class from Alex Potsides
@@ -28,6 +33,19 @@
  *		- intial release of the plugin
  */
 
+$plugin_is_filter = 5|CLASS_PLUGIN;
+$plugin_description = gettext("Akismet SPAM filter");
+$plugin_author = "Vincent Bourganel (vincent3569)";
+
+$plugin_disable = (isset($_zp_spamFilter) && !getoption('zp_plugin_akismet')) ? sprintf(gettext('Only one SPAM handler plugin may be enalbed. <a href="#%1$s"><code>%1$s</code></a> is already enabled.'), $_zp_spamFilter->name) : '';
+
+$option_interface = 'AkismetSpamFilter';
+
+if ($plugin_disable) {
+	setOption('zp_plugin_akismet', 0);
+} else {
+	$_zp_spamFilter = new AkismetSpamFilter();
+}
 
 
 /**
@@ -48,8 +66,8 @@ function submitSpam($comment) {
 	$website = $comment->getWebsite();
 	$body = $comment->getComment();
 
-	$spamfilter = new SpamFilter();
-	$spamfilter->feedbackMessage($id, $author, $email, $website, $body, false);
+	$_zp_spamFilter = new AkismetSpamFilter();
+	$_zp_spamFilter->feedbackMessage($id, $author, $email, $website, $body, false);
 
 	return $comment;
 }
@@ -66,26 +84,32 @@ function submitHam($comment) {
 	$website = $comment->getWebsite();
 	$body = $comment->getComment();
 
-	$spamfilter = new SpamFilter();
-	$spamfilter->feedbackMessage($id, $author, $email, $website, $body, true);
+	$_zp_spamFilter = new AkismetSpamFilter();
+	$_zp_spamFilter->feedbackMessage($id, $author, $email, $website, $body, true);
 
 	return $comment;
 }
 
 
-
-/**************************************************************************************
- *	This implements the ZenPhoto standard SpamFilter class for the Akismet spam filter.
+/**
+ * The Class AkismetSpamFilter
  */
-class SpamFilter {
+class AkismetSpamFilter {
+
+	var $name = 'akismet';
 
 	/**
-	 *	The SpamFilter class instantiation function.
-	 *	@return SpamFilter
+	 * The AkismetSpamFilter class instantiation function.
+	 *
+	 * @return AkismetSpamFilter
 	 */
-	function SpamFilter() {
+	function __construct() {
 		setOptionDefault('Akismet_key', '');
 		setOptionDefault('Forgiving', 0);
+	}
+
+	function displayName() {
+		return $this->name;
 	}
 
 	/**
@@ -108,7 +132,7 @@ class SpamFilter {
 			$msg = '<p class="errorbox">' . gettext('You need to provide a valid Akismet key.') . '</p>';
 		}
 		if (getOption('Akismet_key') && ($isValidKey == 3)) {
-			$msg = '<p class="notebox">' . gettext('Akismet server is too busy : your Akismet API Key can\'t be checked. Please, try agin later.') . '</p>';
+			$msg = '<p class="notebox">' . gettext('Akismet server is too busy : your Akismet API Key can\'t be checked. Please, try again later.') . '</p>';
 		}
 		return array(
 			gettext('Akismet key') => array('key' => 'Akismet_key', 'type' => 0, 'desc' => '<p>' . gettext('Proper operation requires an Akismet API key obtained by signing up for a <a href="http://akismet.com/">Akismet</a> account.') . '</p>' . $msg),
@@ -161,7 +185,7 @@ class SpamFilter {
 				if (DEBUG_FILTERS) {debugLog('====> $akismet->isCommentSpam : this is a SPAM. Author : ' . $author . '. Email : ' . $email);}
 			} else {
 				// Message is not spam according to Akismet
-				if (DEBUG_FILTERS) {debugLog('====> $akismet->isCommentSpam : this is not a SPAM. Author : ' . $author . '. Email : ' . $email);}
+				/*if (DEBUG_FILTERS)*/ {debugLog('====> $akismet->isCommentSpam : this is not a SPAM. Author : ' . $author . '. Email : ' . $email);}
 			}
 		} catch (Exception $e) {
 			// Due to an error with Akismet server, message is marked for moderation
@@ -175,9 +199,9 @@ class SpamFilter {
 	/**
 	 *	The function to see if the provided API key is a valid one
 	 *	@returns : int
-	 *			0 if API Key is valid
-	 *			1 if API Key is invalid
-	 *			2 if API Key is valid can't be checked
+	 *			1 if API Key is valid
+	 *			2 if API Key is invalid
+	 *			3 if API Key is valid can't be checked
 	 */ 
 	function isValidKey() {
 
@@ -235,12 +259,11 @@ class SpamFilter {
 		}
 	}
 
-}	// end of class SpamFilter
+}	// end of class AkismetSpamFilter
 
 
 
-
-/**
+/****
  * Akismet anti-comment spam service
  *
  * The class in this package allows use of the {@link http://akismet.com Akismet} anti-comment spam service in any PHP5 application.

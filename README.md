@@ -10,7 +10,7 @@ Feel free to download and use it, and thanks in advance for your feedback!
 Please, read [install.txt](https://github.com/vincent3569/akismet/blob/master/install.txt).
 
 ### Important
-To use the release **1.0.0** of the plugin, you must have **ZenPhoto less than or equal to to version 1.4.1.6**.
+To use the release **1.2.0** of the plugin, you must have **ZenPhoto greater than or equal to to version 1.4.2**.
 If you use another release of ZenPhoto, see [archives of akismet](https://github.com/vincent3569/akismet/releases).
 
 Report issues on the [ZenPhoto forum](http://www.zenphoto.org/support/) or create a new issue on [GitHub](https://github.com/vincent3569/akismet/issues) and I will fix it as soon as possible (only the latest version is supported).

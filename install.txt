@@ -1,0 +1,6 @@
+Important:
+To use the release 1.0.0 of the plugin, you must have ZenPhoto less than or equal to to version 1.4.1.6.
+
+Export the file akismet_php5.php in the directory /zp-core/zp-extensions/spamfilters of your ZenPhoto site
+In the admin of ZenPhoto, go to options>comments tabs and select the filter akismet_php5
+Go to Akismet website to register and get a key and enter it in the akismet_key

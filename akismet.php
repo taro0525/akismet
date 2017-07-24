@@ -2,7 +2,7 @@
 /**
  *	This is plugin for Akismet SPAM filtering using the Akismet PHP5 Class
  * @author Vincent Bourganel (vincent3569)
- * @version 2.0.1
+ * @version 2.0.3
  * @package plugins
  * @subpackage spam
  *

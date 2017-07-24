@@ -1,7 +1,7 @@
 ﻿## akismet
 
 Plugin for ZenPhoto, based on [php5 Akismet class](https://github.com/achingbrain/php5-akismet).
-Each comment entered by visitor is sent to the Akismet server,and after analysis, the server returns whether the message is spam or not.
+Each comment entered by visitor is sent to the Akismet server, and after analysis, the server returns whether the message is spam or not.
 The comment is then published, moderate or rejected automatically...
 
 Feel free to download and use it, and thanks in advance for your feedback!
